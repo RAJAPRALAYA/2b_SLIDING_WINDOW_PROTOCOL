@@ -12,23 +12,41 @@
 ```
 
 import socket
-s=socket.socket()
-s.bind(('localhost',8000))
+
+s = socket.socket()
+s.bind(('127.0.0.1', 9000))
 s.listen(5)
-c,addr=s.accept()
-size=int(input("Enter number of frames to send : "))
-l=list(range(size))
-s=int(input("Enter Window Size : "))
-st=0
-i=0
-while True:
-    while(i<len(l)):
-        st+=s
-        c.send(str(l[i:st]).encode())
-        ack=c.recv(1024).decode()
-        if ack:
-            print(ack)
-            i+=s
+
+print("Server is waiting for connection...", flush=True)
+
+c, addr = s.accept()
+
+print("CLIENT IS CONNECTED", flush=True)
+print("Client address:", addr, flush=True)
+
+size = int(input("Enter number of frames to send: "))
+frames = list(range(size))
+
+w = int(input("Enter Window Size: "))
+
+i = 0
+
+while i < len(frames):
+    st = min(i + w, len(frames))
+
+    c.send(str(frames[i:st]).encode())
+
+    ack = c.recv(1024).decode()
+    print(ack)
+
+    i = st
+
+print("All frames sent successfully!")
+
+c.close()
+s.close()
+
+
 
 
 ```
@@ -37,19 +55,36 @@ while True:
 ```
 
 import socket
-s=socket.socket()
-s.connect(('localhost',8000))
+
+s = socket.socket()
+
+s.connect(('127.0.0.1', 9000))
+
+print("Connected to server")
+
 while True:
-    print(s.recv(1024).decode())
-    s.send("acknowledgement recived from the server".encode())
+    data = s.recv(1024).decode()
+
+    if not data:
+        break
+
+    print("Received frames:", data)
+
+    s.send("Acknowledgement received".encode())
+
+print("Communication completed")
+
+s.close()
+
+
 
 ```
 ## OUPUT
 ## Server
-<img width="1411" height="263" alt="image" src="https://github.com/user-attachments/assets/644ef5b3-e66d-4fd8-bf62-c9ed66782c97" />
+<img width="1395" height="271" alt="image" src="https://github.com/user-attachments/assets/c65ef5f4-3081-4d1b-937e-124911341ae4" />
 
 ## Client
-<img width="1428" height="147" alt="image" src="https://github.com/user-attachments/assets/9a3bfdc1-33c4-4d16-9de0-a42dbff39ba0" />
+<img width="1422" height="240" alt="image" src="https://github.com/user-attachments/assets/914ca834-b662-4572-a549-7a927f4593b5" />
 
 ## RESULT
 Thus, python program to perform stop and wait protocol was successfully executed
